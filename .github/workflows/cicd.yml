@@ -2,9 +2,9 @@ name: Server CI/CD
 
 on:
   push:
-    paths:
-      - "server/**"
-    branches: [ "main" ]
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   build:
