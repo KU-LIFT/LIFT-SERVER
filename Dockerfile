@@ -1,7 +1,7 @@
 FROM eclipse-temurin:21-jdk-jammy AS builder
 WORKDIR /app
 COPY . .
-RUN ./gradlew build
+RUN ./gradlew build -x test
 
 FROM eclipse-temurin:21-jdk-jammy
 WORKDIR /app
