@@ -18,8 +18,33 @@ spring:
       max-file-size: 10MB
       max-request-size: 20MB
 
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope: profile, email
+            redirect-uri: "http://kulift.com/login/oauth2/code/google"
+          github:
+            client-id: ${GIT_CLIENT_ID}
+            client-secret: ${GIT_CLIENT_SECRET}
+            scope: read:user,user:email
+            redirect-uri: "http://kulift.com/login/oauth2/code/github"
+
+        provider:
+          github:
+            authorization-uri: https://github.com/login/oauth/authorize
+            token-uri: https://github.com/login/oauth/access_token
+            user-info-uri: https://api.github.com/user
+
+
 logging:
   level:
     root: INFO
     org.springframework.web: DEBUG
+
+jwt:
+  secret: ${JWT_SECRET}
 
