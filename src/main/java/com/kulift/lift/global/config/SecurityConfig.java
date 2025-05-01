@@ -4,12 +4,14 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -38,14 +40,24 @@ public class SecurityConfig {
 		return http
 			.csrf(csrf -> csrf.disable())
 			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+			.exceptionHandling(ex -> ex
+				.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+				.accessDeniedHandler((req, res, ex2) ->
+					res.sendError(HttpStatus.FORBIDDEN.value()))
+			)
 			.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(auth -> auth
-				.requestMatchers("/api/auth/**", "/oauth2/**", "/login/**").permitAll()
-				.anyRequest().authenticated()
+				.requestMatchers(SecurityWhitelistUrls.PERMIT_ALL)
+				.permitAll()
+				.anyRequest()
+				.authenticated()
 			)
 			.oauth2Login(oauth -> oauth
 				.userInfoEndpoint(endpoint -> endpoint.userService(customOAuth2UserService))
 				.successHandler(oAuth2LoginSuccessHandler)
+				.failureHandler((req, res, ex) -> {
+					res.sendError(HttpStatus.UNAUTHORIZED.value(), "OAuth2 Authentication Failed");
+				})
 			)
 			.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, customUserDetailsService),
 				UsernamePasswordAuthenticationFilter.class)

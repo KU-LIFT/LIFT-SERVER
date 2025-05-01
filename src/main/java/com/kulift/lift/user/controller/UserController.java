@@ -2,6 +2,7 @@ package com.kulift.lift.user.controller;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kulift.lift.auth.security.CustomUserDetails;
-import com.kulift.lift.global.response.ApiResponse;
 import com.kulift.lift.user.dto.PasswordUpdateRequest;
 import com.kulift.lift.user.dto.UserResponse;
 import com.kulift.lift.user.entity.User;
@@ -29,38 +29,36 @@ public class UserController {
 	private final UserService userService;
 
 	@GetMapping("/me")
-	public ApiResponse<UserResponse> getMyInfo(Authentication authentication) {
+	public ResponseEntity<UserResponse> getMyInfo(Authentication authentication) {
 		User user = userService.findByEmail(authentication.getName());
-		return ApiResponse.ok(UserResponse.from(user));
+		return ResponseEntity.ok(UserResponse.from(user));
 	}
 
 	@GetMapping
-	public ApiResponse<List<UserResponse>> getAllUsers() {
-		return ApiResponse.ok(
-			userService.findAll().stream()
-				.map(UserResponse::from)
-				.toList()
-		);
+	public ResponseEntity<List<UserResponse>> getAllUsers() {
+		List<UserResponse> users = userService.findAll().stream()
+			.map(UserResponse::from)
+			.toList();
+		return ResponseEntity.ok(users);
 	}
 
 	@GetMapping("/{id}")
-	public ApiResponse<UserResponse> getUserById(@PathVariable Long id) {
-		return ApiResponse.ok(UserResponse.from(userService.findById(id)));
+	public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
+		User user = userService.findById(id);
+		return ResponseEntity.ok(UserResponse.from(user));
 	}
 
 	@PatchMapping("/me")
-	public ApiResponse<String> updateUserPassword(
-		@RequestBody @Valid PasswordUpdateRequest request,
-		Authentication authentication
-	) {
+	public ResponseEntity<String> updateUserPassword(@RequestBody @Valid PasswordUpdateRequest request,
+		Authentication authentication) {
 		CustomUserDetails userDetails = (CustomUserDetails)authentication.getPrincipal();
 		userService.updatePassword(userDetails.getId(), request.password());
-		return ApiResponse.ok("비밀번호가 성공적으로 변경되었습니다.");
+		return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
 	}
 
 	@DeleteMapping("/{id}")
-	public ApiResponse<String> deleteUser(@PathVariable Long id) {
+	public ResponseEntity<String> deleteUser(@PathVariable Long id) {
 		userService.delete(id);
-		return ApiResponse.ok("삭제되었습니다.");
+		return ResponseEntity.ok("삭제되었습니다.");
 	}
 }

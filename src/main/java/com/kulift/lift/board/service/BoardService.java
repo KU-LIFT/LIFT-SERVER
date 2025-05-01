@@ -1,0 +1,84 @@
+// com/kulift/lift/board/service/BoardService.java
+package com.kulift.lift.board.service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.kulift.lift.board.dto.BoardCreateRequest;
+import com.kulift.lift.board.dto.BoardResponse;
+import com.kulift.lift.board.dto.BoardUpdateRequest;
+import com.kulift.lift.board.entity.Board;
+import com.kulift.lift.board.entity.BoardColumn;
+import com.kulift.lift.board.entity.BoardTemplate;
+import com.kulift.lift.board.repository.BoardRepository;
+import com.kulift.lift.board.repository.BoardTemplateRepository;
+import com.kulift.lift.global.exception.CustomException;
+import com.kulift.lift.global.exception.ErrorCode;
+import com.kulift.lift.project.entity.Project;
+import com.kulift.lift.project.service.ProjectService;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
+public class BoardService {
+
+	private final BoardRepository boardRepository;
+	private final ProjectService projectService;
+	private final BoardTemplateRepository templateRepository;
+
+	public List<BoardResponse> getBoardsByProjectKey(String projectKey) {
+		Project project = projectService.findProjectByKey(projectKey);
+		return boardRepository.findByProject(project).stream()
+			.map(BoardResponse::from)
+			.collect(Collectors.toList());
+	}
+
+	public BoardResponse getBoardById(Long boardId) {
+		Board board = findBoardById(boardId);
+		return BoardResponse.from(board);
+	}
+
+	@Transactional
+	public BoardResponse createBoard(String projectKey, BoardCreateRequest request) {
+		Project project = projectService.findProjectByKey(projectKey);
+		Board board = Board.create(request.getName(), project);
+		applyTemplate(board, request.getTemplateId());
+		boardRepository.save(board);
+		return BoardResponse.from(board);
+	}
+
+	private void applyTemplate(Board board, Long templateId) {
+		if (templateId == null) {
+			return;
+		}
+		BoardTemplate tpl = templateRepository.findById(templateId)
+			.orElseThrow(() -> new CustomException(ErrorCode.BOARD_TEMPLATE_NOT_FOUND));
+		for (String colName : tpl.getTemplateColumns()) {
+			BoardColumn col = BoardColumn.create(colName, board);
+			board.getColumns().add(col);
+		}
+	}
+
+	@Transactional
+	public BoardResponse updateBoard(Long boardId, BoardUpdateRequest request) {
+		Board board = findBoardById(boardId);
+		board.setName(request.getName());
+		return BoardResponse.from(board);
+	}
+
+	@Transactional
+	public void deleteBoard(Long boardId) {
+		Board board = findBoardById(boardId);
+		boardRepository.delete(board);
+	}
+
+	public Board findBoardById(Long boardId) {
+		return boardRepository.findById(boardId)
+			.orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
+	}
+}
