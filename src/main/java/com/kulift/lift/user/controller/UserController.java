@@ -3,7 +3,7 @@ package com.kulift.lift.user.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kulift.lift.auth.security.CustomUserDetails;
 import com.kulift.lift.user.dto.PasswordUpdateRequest;
 import com.kulift.lift.user.dto.UserResponse;
-import com.kulift.lift.user.entity.User;
 import com.kulift.lift.user.service.UserService;
 
 import jakarta.validation.Valid;
@@ -29,29 +28,24 @@ public class UserController {
 	private final UserService userService;
 
 	@GetMapping("/me")
-	public ResponseEntity<UserResponse> getMyInfo(Authentication authentication) {
-		User user = userService.findByEmail(authentication.getName());
-		return ResponseEntity.ok(UserResponse.from(user));
+	public ResponseEntity<UserResponse> getMyInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
+		return ResponseEntity.ok(UserResponse.from(userService.findById(userDetails.getId())));
 	}
 
 	@GetMapping
 	public ResponseEntity<List<UserResponse>> getAllUsers() {
-		List<UserResponse> users = userService.findAll().stream()
-			.map(UserResponse::from)
-			.toList();
+		List<UserResponse> users = userService.findAll().stream().map(UserResponse::from).toList();
 		return ResponseEntity.ok(users);
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
-		User user = userService.findById(id);
-		return ResponseEntity.ok(UserResponse.from(user));
+		return ResponseEntity.ok(UserResponse.from(userService.findById(id)));
 	}
 
 	@PatchMapping("/me")
 	public ResponseEntity<String> updateUserPassword(@RequestBody @Valid PasswordUpdateRequest request,
-		Authentication authentication) {
-		CustomUserDetails userDetails = (CustomUserDetails)authentication.getPrincipal();
+		@AuthenticationPrincipal CustomUserDetails userDetails) {
 		userService.updatePassword(userDetails.getId(), request.password());
 		return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
 	}

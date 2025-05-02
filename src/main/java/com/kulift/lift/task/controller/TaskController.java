@@ -5,6 +5,7 @@ import static com.kulift.lift.project.entity.ProjectRole.*;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kulift.lift.auth.security.CustomUserDetails;
 import com.kulift.lift.project.aop.RequireProjectRole;
 import com.kulift.lift.task.dto.TaskRequest;
 import com.kulift.lift.task.dto.TaskResponse;
@@ -30,6 +32,13 @@ public class TaskController {
 	private final TaskService taskService;
 
 	@RequireProjectRole(MEMBER)
+	@PostMapping
+	public ResponseEntity<TaskResponse> createTask(@RequestBody @Valid TaskRequest request,
+		@AuthenticationPrincipal CustomUserDetails userDetails) {
+		return ResponseEntity.ok(taskService.createTask(request, userDetails.getId()));
+	}
+
+	@RequireProjectRole(MEMBER)
 	@GetMapping
 	public ResponseEntity<List<TaskResponse>> getTasks() {
 		return ResponseEntity.ok(taskService.getAllTasks());
@@ -42,15 +51,10 @@ public class TaskController {
 	}
 
 	@RequireProjectRole(MEMBER)
-	@PostMapping
-	public ResponseEntity<TaskResponse> createTask(@RequestBody @Valid TaskRequest request) {
-		return ResponseEntity.ok(taskService.createTask(request));
-	}
-
-	@RequireProjectRole(MEMBER)
 	@PutMapping("/{taskId}")
-	public ResponseEntity<TaskResponse> updateTask(@PathVariable Long taskId, @RequestBody @Valid TaskRequest request) {
-		return ResponseEntity.ok(taskService.updateTask(taskId, request));
+	public ResponseEntity<TaskResponse> updateTask(@PathVariable Long taskId, @RequestBody @Valid TaskRequest request,
+		@AuthenticationPrincipal CustomUserDetails userDetails) {
+		return ResponseEntity.ok(taskService.updateTask(taskId, request, userDetails.getId()));
 	}
 
 	@RequireProjectRole(MEMBER)

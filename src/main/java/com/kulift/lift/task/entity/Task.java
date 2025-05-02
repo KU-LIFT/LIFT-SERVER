@@ -18,8 +18,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -76,13 +74,31 @@ public class Task {
 	@JoinColumn(name = "updated_by")
 	private User updatedBy;
 
-	@PrePersist
-	void prePersist() {
-		createdAt = LocalDateTime.now();
+	public static Task create(String name, String description, BoardColumn column, User assignee, Priority priority,
+		LocalDateTime dueDate, List<String> tags, User creator) {
+		return Task.builder()
+			.name(name)
+			.description(description)
+			.column(column)
+			.assignee(assignee)
+			.priority(priority)
+			.dueDate(dueDate)
+			.tags(tags)
+			.createdBy(creator)
+			.createdAt(LocalDateTime.now())
+			.build();
 	}
 
-	@PreUpdate
-	void preUpdate() {
-		updatedAt = LocalDateTime.now();
+	public void update(String name, String description, User assignee, Priority priority, LocalDateTime dueDate,
+		List<String> tags, User updater) {
+		this.name = name;
+		this.description = description;
+		this.assignee = assignee;
+		this.priority = priority;
+		this.dueDate = dueDate;
+		this.tags = tags;
+		this.updatedBy = updater;
+		this.updatedAt = LocalDateTime.now();
 	}
+
 }

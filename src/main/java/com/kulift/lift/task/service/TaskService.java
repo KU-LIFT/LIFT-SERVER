@@ -15,7 +15,7 @@ import com.kulift.lift.task.dto.TaskResponse;
 import com.kulift.lift.task.entity.Task;
 import com.kulift.lift.task.repository.TaskRepository;
 import com.kulift.lift.user.entity.User;
-import com.kulift.lift.user.repository.UserRepository;
+import com.kulift.lift.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +26,21 @@ public class TaskService {
 
 	private final TaskRepository taskRepository;
 	private final BoardColumnService columnService;
-	private final UserRepository userRepository;
+	private final UserService userService;
+
+	@Transactional
+	public TaskResponse createTask(TaskRequest request, Long userId) {
+		BoardColumn column = columnService.findColumnById(request.getColumnId());
+		User assignee = userService.findById(request.getAssigneeId());
+		User creator = userService.findById(userId);
+
+		Task task = Task.create(request.getName(), request.getDescription(), column, assignee, request.getPriority(),
+			request.getDueDate(), request.getTags(), creator);
+
+		column.addTask(task);
+		taskRepository.save(task);
+		return TaskResponse.from(task);
+	}
 
 	public List<TaskResponse> getAllTasks() {
 		return taskRepository.findAll().stream()
@@ -35,48 +49,17 @@ public class TaskService {
 	}
 
 	public TaskResponse getTask(Long taskId) {
-		Task task = taskRepository.findById(taskId)
-			.orElseThrow(() -> new CustomException(ErrorCode.TASK_NOT_FOUND));
-		return TaskResponse.from(task);
+		return TaskResponse.from(findTaskById(taskId));
 	}
 
 	@Transactional
-	public TaskResponse createTask(TaskRequest request) {
-		BoardColumn column = columnService.findColumnById(request.getColumnId());
-		User assignee = userRepository.findById(request.getAssigneeId())
-			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+	public TaskResponse updateTask(Long taskId, TaskRequest request, Long userId) {
+		Task task = findTaskById(taskId);
+		User assignee = userService.findById(request.getAssigneeId());
+		User updater = userService.findById(userId);
 
-		Task task = Task.builder()
-			.name(request.getName())
-			.description(request.getDescription())
-			.column(column)
-			.assignee(assignee)
-			.priority(request.getPriority())
-			.dueDate(request.getDueDate())
-			.tags(request.getTags())
-			.createdBy(assignee)
-			.build();
-
-		column.addTask(task);
-		taskRepository.save(task);
-		return TaskResponse.from(task);
-	}
-
-	@Transactional
-	public TaskResponse updateTask(Long taskId, TaskRequest request) {
-		Task task = taskRepository.findById(taskId)
-			.orElseThrow(() -> new CustomException(ErrorCode.TASK_NOT_FOUND));
-
-		User assignee = userRepository.findById(request.getAssigneeId())
-			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-		task.setName(request.getName());
-		task.setDescription(request.getDescription());
-		task.setAssignee(assignee);
-		task.setPriority(request.getPriority());
-		task.setDueDate(request.getDueDate());
-		task.setTags(request.getTags());
-		task.setUpdatedBy(assignee);
+		task.update(request.getName(), request.getDescription(), assignee, request.getPriority(), request.getDueDate(),
+			request.getTags(), updater);
 
 		return TaskResponse.from(task);
 	}
@@ -86,5 +69,10 @@ public class TaskService {
 		Task task = taskRepository.findById(taskId)
 			.orElseThrow(() -> new CustomException(ErrorCode.TASK_NOT_FOUND));
 		taskRepository.delete(task);
+	}
+
+	public Task findTaskById(Long taskId) {
+		return taskRepository.findById(taskId)
+			.orElseThrow(() -> new CustomException(ErrorCode.TASK_NOT_FOUND));
 	}
 }
