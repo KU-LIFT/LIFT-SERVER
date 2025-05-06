@@ -81,4 +81,13 @@ public class BoardService {
 		return boardRepository.findById(boardId)
 			.orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
 	}
+
+	public Long findLeftmostColumnId(Long boardId) {
+		Board board = findBoardById(boardId);
+		List<BoardColumn> cols = board.getColumns();
+		if (cols.isEmpty()) {
+			throw new CustomException(ErrorCode.COLUMN_NOT_FOUND);
+		}
+		return cols.getFirst().getId();
+	}
 }
