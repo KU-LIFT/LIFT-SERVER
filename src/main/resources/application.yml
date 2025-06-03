@@ -50,3 +50,6 @@ jwt:
 openai:
   api-key: ${OPENAI_API_KEY}
 
+github:
+  app-id: ${GITHUB_APP_ID}
+  private-key-path: ${GITHUB_PRIVATE_KEY}

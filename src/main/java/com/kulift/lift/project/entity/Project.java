@@ -34,8 +34,23 @@ public class Project {
 
 	private LocalDateTime createdAt;
 
+	private Long githubInstallationId;
+
+	private String githubRepoOwner;
+
+	private String githubRepoName;
+
+	private String githubDefaultBranch;
+
 	public void update(String name, String description) {
 		this.name = name;
 		this.description = description;
+	}
+
+	public void linkGitHubRepository(Long installationId, String owner, String name, String branch) {
+		this.githubInstallationId = installationId;
+		this.githubRepoOwner = owner;
+		this.githubRepoName = name;
+		this.githubDefaultBranch = branch;
 	}
 }

@@ -38,7 +38,13 @@ public enum ErrorCode {
 	TASK_NOT_FOUND("TASK_NOT_FOUND", HttpStatus.NOT_FOUND, "태스크를 찾을 수 없습니다."),
 	INVALID_COLUMN_MOVE("INVALID_COLUMN_MOVE", HttpStatus.BAD_REQUEST, "컬럼 이동이 유효하지 않습니다."),
 	TASK_ASSIGN_ERROR("TASK_ASSIGN_ERROR", HttpStatus.BAD_REQUEST, "태스크 할당에 실패했습니다."),
-	BOARD_TEMPLATE_NOT_FOUND("BOARD_TEMPLATE_NOT_FOUND", HttpStatus.NOT_FOUND, "보드 템플릿을 찾을 수 없습니다.");
+	BOARD_TEMPLATE_NOT_FOUND("BOARD_TEMPLATE_NOT_FOUND", HttpStatus.NOT_FOUND, "보드 템플릿을 찾을 수 없습니다."),
+
+	// GitHub 연동 관련
+	GITHUB_AUTH_FAILED("GITHUB_AUTH_FAILED", HttpStatus.UNAUTHORIZED, "GitHub 인증에 실패했습니다."),
+	GITHUB_REPO_NOT_FOUND("GITHUB_REPO_NOT_FOUND", HttpStatus.NOT_FOUND, "GitHub 저장소를 찾을 수 없습니다."),
+	GITHUB_INSTALLATION_NOT_FOUND("GITHUB_INSTALLATION_NOT_FOUND", HttpStatus.NOT_FOUND,
+		"GitHub App 설치 정보를 찾을 수 없습니다.");
 
 	private final String code;
 	private final HttpStatus status;
