@@ -1,5 +1,7 @@
 package com.kulift.lift.project.controller;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,11 +20,17 @@ public class ProjectGithubController {
 	private final GitHubInstallationService installationService;
 
 	@GetMapping("/install/callback")
-	public ResponseEntity<String> handleInstallationCallback(
+	public ResponseEntity<Void> handleInstallationCallback(
 		@RequestParam("installation_id") Long installationId,
-		@RequestParam("project") String projectKey
+		@RequestParam("state") String projectKey
 	) {
 		installationService.linkInstallationToProject(projectKey, installationId);
-		return ResponseEntity.ok("GitHub App successfully linked to project: " + projectKey);
+
+		// String frontendUrl = "https://kulift.com/projects/" + projectKey + "/settings?github=success";
+		String frontendUrl = "http://localhost:5432/";
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.set(HttpHeaders.LOCATION, frontendUrl);
+		return new ResponseEntity<>(headers, HttpStatus.FOUND);
 	}
 }
