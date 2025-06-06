@@ -74,6 +74,15 @@ public class Task {
 	@JoinColumn(name = "updated_by")
 	private User updatedBy;
 
+	@Column(length = 100)
+	private String githubBranch;
+
+	@Column(length = 200)
+	private String githubPullRequestUrl;
+
+	@Column(length = 100)
+	private String githubLastCommitSha;
+
 	public static Task create(String name, String description, BoardColumn column, User assignee, Priority priority,
 		LocalDateTime dueDate, List<String> tags, User creator) {
 		return Task.builder()
@@ -101,4 +110,9 @@ public class Task {
 		this.updatedAt = LocalDateTime.now();
 	}
 
+	public void linkGitInfo(String branch, String prUrl, String commitSha) {
+		this.githubBranch = branch;
+		this.githubPullRequestUrl = prUrl;
+		this.githubLastCommitSha = commitSha;
+	}
 }

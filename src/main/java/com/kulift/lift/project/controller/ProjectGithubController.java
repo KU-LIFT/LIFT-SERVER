@@ -1,4 +1,4 @@
-package com.kulift.lift.git.controller;
+package com.kulift.lift.project.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/github")
 @RequiredArgsConstructor
-public class GitHubAppCallbackController {
+public class ProjectGithubController {
 
 	private final GitHubInstallationService installationService;
 

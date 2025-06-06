@@ -47,10 +47,10 @@ public class Project {
 		this.description = description;
 	}
 
-	public void linkGitHubRepository(Long installationId, String owner, String name, String branch) {
+	public void connectGithubRepository(Long installationId, String owner, String name, String defaultBranch) {
 		this.githubInstallationId = installationId;
 		this.githubRepoOwner = owner;
 		this.githubRepoName = name;
-		this.githubDefaultBranch = branch;
+		this.githubDefaultBranch = defaultBranch;
 	}
 }

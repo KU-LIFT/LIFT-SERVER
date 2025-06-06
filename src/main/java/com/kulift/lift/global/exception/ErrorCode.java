@@ -42,9 +42,13 @@ public enum ErrorCode {
 
 	// GitHub 연동 관련
 	GITHUB_AUTH_FAILED("GITHUB_AUTH_FAILED", HttpStatus.UNAUTHORIZED, "GitHub 인증에 실패했습니다."),
-	GITHUB_REPO_NOT_FOUND("GITHUB_REPO_NOT_FOUND", HttpStatus.NOT_FOUND, "GitHub 저장소를 찾을 수 없습니다."),
 	GITHUB_INSTALLATION_NOT_FOUND("GITHUB_INSTALLATION_NOT_FOUND", HttpStatus.NOT_FOUND,
-		"GitHub App 설치 정보를 찾을 수 없습니다.");
+		"GitHub App 설치 정보를 찾을 수 없습니다."),
+	GITHUB_REPO_NOT_FOUND("GITHUB_REPO_NOT_FOUND", HttpStatus.NOT_FOUND, "GitHub 저장소 정보를 찾을 수 없습니다."),
+	GITHUB_TOKEN_ERROR("GITHUB_TOKEN_ERROR", HttpStatus.UNAUTHORIZED, "GitHub Access Token 발급에 실패했습니다."),
+	GITHUB_BRANCH_ERROR("GITHUB_BRANCH_ERROR", HttpStatus.BAD_REQUEST, "GitHub 브랜치 생성 또는 조회에 실패했습니다."),
+	GITHUB_COMMIT_ERROR("GITHUB_COMMIT_ERROR", HttpStatus.BAD_REQUEST, "GitHub 커밋 조회에 실패했습니다."),
+	GITHUB_PR_ERROR("GITHUB_PR_ERROR", HttpStatus.BAD_REQUEST, "GitHub Pull Request 생성/조회에 실패했습니다.");;
 
 	private final String code;
 	private final HttpStatus status;

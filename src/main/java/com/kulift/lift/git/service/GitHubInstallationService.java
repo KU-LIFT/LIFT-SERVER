@@ -30,30 +30,26 @@ public class GitHubInstallationService {
 		Project project = projectRepository.findByProjectKey(projectKey)
 			.orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NOT_FOUND));
 
-		String jwt = tokenService.generateAppJwtToken();
+		String accessToken = tokenService.getInstallationAccessToken(installationId);
 
-		// installation access token 요청
-		String accessToken = githubClient.post()
-			.uri("/app/installations/{installation_id}/access_tokens", installationId)
-			.header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
-			.retrieve()
-			.bodyToMono(JsonNode.class)
-			.block()
-			.get("token").asText();
-
-		// 설치된 레포지토리 조회
-		JsonNode repo = githubClient.get()
+		JsonNode repoList = githubClient.get()
 			.uri("/installation/repositories")
 			.header(HttpHeaders.AUTHORIZATION, "token " + accessToken)
 			.retrieve()
 			.bodyToMono(JsonNode.class)
-			.block()
-			.get("repositories").get(0);
+			.block();
 
-		String owner = repo.get("owner").get("login").asText();
-		String name = repo.get("name").asText();
-		String branch = repo.get("default_branch").asText();
+		if (repoList == null
+			|| !repoList.has("repositories")
+			|| repoList.get("repositories").isEmpty()) {
+			throw new CustomException(ErrorCode.GITHUB_REPO_NOT_FOUND);
+		}
 
-		project.linkGitHubRepository(installationId, owner, name, branch);
+		JsonNode firstRepo = repoList.get("repositories").get(0);
+		String owner = firstRepo.get("owner").get("login").asText();
+		String name = firstRepo.get("name").asText();
+		String defaultBranch = firstRepo.get("default_branch").asText();
+
+		project.connectGithubRepository(installationId, owner, name, defaultBranch);
 	}
 }
