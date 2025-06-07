@@ -7,6 +7,7 @@ public final class SecurityWhitelistUrls {
 		"/api/auth/**",
 		"/oauth2/**",
 		"/login/**",
+		"/api/github/install/callback",
 		/* ---------- Swagger ---------- */
 		"/swagger-ui/**",
 		"/v3/api-docs/**"
