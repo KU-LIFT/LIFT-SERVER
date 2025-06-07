@@ -38,7 +38,6 @@ public class Board {
 	@Column(nullable = false, length = 80)
 	private String name;
 
-	@Column(nullable = false)
 	private String projectKey;    // 조회 최적화
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
