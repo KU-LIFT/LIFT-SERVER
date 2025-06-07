@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kulift.lift.board.service.BoardService;
 import com.kulift.lift.git.service.GitHubInstallationService;
 
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class ProjectGithubController {
 
 	private final GitHubInstallationService installationService;
+	private final BoardService boardService;
 
 	@GetMapping("/install/callback")
 	public ResponseEntity<Void> handleInstallationCallback(
@@ -25,12 +27,12 @@ public class ProjectGithubController {
 		@RequestParam("state") String projectKey
 	) {
 		installationService.linkInstallationToProject(projectKey, installationId);
+		Long boardId = boardService.findFirstBoardIdByProjectKey(projectKey);
 
-		String frontendUrl = "http://kulift.com/projects/" + projectKey;
-		// String frontendUrl = "http://localhost:5432/";
+		String redirectUrl = "http://kulift.com/projects/" + projectKey + "/boards/" + boardId;
 
 		HttpHeaders headers = new HttpHeaders();
-		headers.set(HttpHeaders.LOCATION, frontendUrl);
+		headers.set(HttpHeaders.LOCATION, redirectUrl);
 		return new ResponseEntity<>(headers, HttpStatus.FOUND);
 	}
 }

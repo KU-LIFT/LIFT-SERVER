@@ -57,6 +57,12 @@ public class BoardService {
 		return BoardResponse.from(board);
 	}
 
+	public Long findFirstBoardIdByProjectKey(String projectKey) {
+		return boardRepository.findFirstByProjectKeyOrderByIdAsc(projectKey)
+			.map(Board::getId)
+			.orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
+	}
+
 	@Transactional
 	public BoardResponse updateBoard(Long boardId, BoardUpdateRequest request) {
 		Board board = findBoardById(boardId);

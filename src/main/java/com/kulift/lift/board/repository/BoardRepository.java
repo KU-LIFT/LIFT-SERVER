@@ -12,4 +12,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 	List<Board> findByProject(Project project);
 
 	Optional<Board> findByIdAndProject(Long id, Project project);
+
+	Optional<Board> findFirstByProjectKeyOrderByIdAsc(String projectKey);
 }

@@ -38,6 +38,9 @@ public class Board {
 	@Column(nullable = false, length = 80)
 	private String name;
 
+	@Column(nullable = false)
+	private String projectKey;    // 조회 최적화
+
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	private Project project;
 
@@ -51,6 +54,7 @@ public class Board {
 	public static Board create(String name, Project project) {
 		return Board.builder()
 			.name(name)
+			.projectKey(project.getProjectKey())
 			.project(project)
 			.createdAt(LocalDateTime.now())
 			.build();
