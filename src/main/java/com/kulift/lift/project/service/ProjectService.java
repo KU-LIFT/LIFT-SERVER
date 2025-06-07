@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.kulift.lift.board.service.BoardService;
 import com.kulift.lift.global.exception.CustomException;
 import com.kulift.lift.global.exception.ErrorCode;
 import com.kulift.lift.project.dto.ProjectCreateRequest;
@@ -27,6 +28,7 @@ public class ProjectService {
 	private final ProjectRepository projectRepository;
 	private final UserRepository userRepository;
 	private final ProjectMemberService projectMemberService;
+	private final BoardService boardService;
 
 	@Transactional
 	public ProjectResponse createProject(ProjectCreateRequest request, Long userId) {
@@ -47,7 +49,7 @@ public class ProjectService {
 		Project savedProject = projectRepository.save(project);
 		projectMemberService.addMember(savedProject, user, ProjectRole.OWNER);
 
-		return ProjectResponse.from(savedProject);
+		return ProjectResponse.from(savedProject, boardService.createDefaultBoard(request.getProjectKey()));
 	}
 
 	@Transactional(readOnly = true)

@@ -26,8 +26,8 @@ public class ProjectGithubController {
 	) {
 		installationService.linkInstallationToProject(projectKey, installationId);
 
-		// String frontendUrl = "https://kulift.com/projects/" + projectKey + "/settings?github=success";
-		String frontendUrl = "http://localhost:5432/";
+		String frontendUrl = "http://kulift.com/projects/" + projectKey;
+		// String frontendUrl = "http://localhost:5432/";
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.set(HttpHeaders.LOCATION, frontendUrl);
