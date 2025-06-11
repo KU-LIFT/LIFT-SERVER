@@ -8,14 +8,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kulift.lift.auth.dto.LoginRequest;
-import com.kulift.lift.auth.dto.RefreshRequest;
 import com.kulift.lift.auth.dto.SignupRequest;
 import com.kulift.lift.auth.dto.TokenResponse;
 import com.kulift.lift.auth.jwt.JwtTokenProvider;
 import com.kulift.lift.auth.jwt.RefreshTokenService;
+import com.kulift.lift.global.exception.CustomException;
+import com.kulift.lift.global.exception.ErrorCode;
 import com.kulift.lift.user.entity.User;
 import com.kulift.lift.user.service.UserService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -39,21 +41,28 @@ public class AuthController {
 	public ResponseEntity<TokenResponse> login(@RequestBody @Valid LoginRequest req) {
 		User user = userService.findByEmail(req.email());
 		if (!passwordEncoder.matches(req.password(), user.getPassword())) {
-			throw new RuntimeException("비밀번호가 일치하지 않습니다");
+			throw new CustomException(ErrorCode.INVALID_PASSWORD);
 		}
 		String accessToken = jwtTokenProvider.createAccessToken(user);
 		String refreshToken = jwtTokenProvider.createRefreshToken(user);
-		refreshTokenService.save(user.getEmail(), refreshToken);
-		return ResponseEntity.ok(new TokenResponse(accessToken, refreshToken));
+		long refreshTokenExpiration = jwtTokenProvider.getExpiration(refreshToken);
+
+		refreshTokenService.save(user.getEmail(), refreshToken, refreshTokenExpiration);
+		return ResponseEntity.ok(TokenResponse.of(accessToken, refreshToken));
 	}
 
-	@PostMapping("/token/refresh")
-	public ResponseEntity<String> refresh(@RequestBody RefreshRequest req) {
-		if (!refreshTokenService.isValid(req.email(), req.refreshToken())) {
-			throw new RuntimeException("Refresh Token이 유효하지 않습니다");
+	@PostMapping("/refresh")
+	public ResponseEntity<TokenResponse> refresh(HttpServletRequest request) {
+		String refreshToken = jwtTokenProvider.resolveToken(request);
+		String email = jwtTokenProvider.getEmail(refreshToken);
+
+		if (refreshToken == null || !jwtTokenProvider.validateToken(refreshToken) || !refreshTokenService.isValid(email,
+			refreshToken)) {
+			throw new CustomException(ErrorCode.INVALID_TOKEN);
 		}
-		User user = userService.findByEmail(req.email());
+
+		User user = userService.findByEmail(email);
 		String newAccessToken = jwtTokenProvider.createAccessToken(user);
-		return ResponseEntity.ok(newAccessToken);
+		return ResponseEntity.ok(TokenResponse.of(newAccessToken));
 	}
 }

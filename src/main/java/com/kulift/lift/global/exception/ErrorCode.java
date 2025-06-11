@@ -18,6 +18,7 @@ public enum ErrorCode {
 	// 사용자 관련
 	USER_NOT_FOUND("USER_NOT_FOUND", HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."),
 	DUPLICATE_EMAIL("DUPLICATE_EMAIL", HttpStatus.BAD_REQUEST, "이미 존재하는 이메일입니다."),
+	INVALID_PASSWORD("INVALID_PASSWORD", HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
 	INVALID_TOKEN("INVALID_TOKEN", HttpStatus.UNAUTHORIZED, "토큰이 유효하지 않습니다."),
 	TOKEN_EXPIRED("TOKEN_EXPIRED", HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),
 
