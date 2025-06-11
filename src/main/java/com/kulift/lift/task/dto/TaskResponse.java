@@ -16,14 +16,14 @@ public class TaskResponse {
 	private String name;
 	private String description;
 	private Long columnId;
-	private Long assigneeId;
+	private String assignee;
 	private Priority priority;
 	private LocalDateTime dueDate;
 	private List<String> tags;
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
-	private Long createdById;
-	private Long updatedById;
+	private String createdBy;
+	private String updatedBy;
 
 	public static TaskResponse from(Task task) {
 		return TaskResponse.builder()
@@ -31,14 +31,14 @@ public class TaskResponse {
 			.name(task.getName())
 			.description(task.getDescription())
 			.columnId(task.getColumn().getId())
-			.assigneeId(task.getAssignee() != null ? task.getAssignee().getId() : null)
+			.assignee(task.getAssignee() != null ? task.getAssignee().getName() : null)
 			.priority(task.getPriority())
 			.dueDate(task.getDueDate())
 			.tags(task.getTags())
 			.createdAt(task.getCreatedAt())
 			.updatedAt(task.getUpdatedAt())
-			.createdById(task.getCreatedBy() != null ? task.getCreatedBy().getId() : null)
-			.updatedById(task.getUpdatedBy() != null ? task.getUpdatedBy().getId() : null)
+			.createdBy(task.getCreatedBy() != null ? task.getCreatedBy().getName() : null)
+			.updatedBy(task.getUpdatedBy() != null ? task.getUpdatedBy().getName() : null)
 			.build();
 	}
 }

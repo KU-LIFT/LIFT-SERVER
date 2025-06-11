@@ -82,34 +82,7 @@ public class Task {
 
 	@Column(length = 100)
 	private String githubLastCommitSha;
-
-	public static Task create(String name, String description, BoardColumn column, User assignee, Priority priority,
-		LocalDateTime dueDate, List<String> tags, User creator) {
-		return Task.builder()
-			.name(name)
-			.description(description)
-			.column(column)
-			.assignee(assignee)
-			.priority(priority)
-			.dueDate(dueDate)
-			.tags(tags)
-			.createdBy(creator)
-			.createdAt(LocalDateTime.now())
-			.build();
-	}
-
-	public void update(String name, String description, User assignee, Priority priority, LocalDateTime dueDate,
-		List<String> tags, User updater) {
-		this.name = name;
-		this.description = description;
-		this.assignee = assignee;
-		this.priority = priority;
-		this.dueDate = dueDate;
-		this.tags = tags;
-		this.updatedBy = updater;
-		this.updatedAt = LocalDateTime.now();
-	}
-
+	
 	public void linkGitInfo(String branch, String prUrl, String commitSha) {
 		this.githubBranch = branch;
 		this.githubPullRequestUrl = prUrl;
