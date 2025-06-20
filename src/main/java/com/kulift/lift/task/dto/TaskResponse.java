@@ -20,6 +20,8 @@ public class TaskResponse {
 	private Priority priority;
 	private LocalDateTime dueDate;
 	private List<String> tags;
+	private String githubBranch;
+	private String githubPullRequestUrl;
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
 	private String createdBy;
@@ -35,6 +37,8 @@ public class TaskResponse {
 			.priority(task.getPriority())
 			.dueDate(task.getDueDate())
 			.tags(task.getTags())
+			.githubBranch(task.getGithubBranch())
+			.githubPullRequestUrl(task.getGithubPullRequestUrl())
 			.createdAt(task.getCreatedAt())
 			.updatedAt(task.getUpdatedAt())
 			.createdBy(task.getCreatedBy() != null ? task.getCreatedBy().getName() : null)
