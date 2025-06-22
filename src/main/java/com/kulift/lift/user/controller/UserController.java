@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kulift.lift.auth.security.CustomUserDetails;
-import com.kulift.lift.task.dto.TaskResponse;
-import com.kulift.lift.task.service.TaskService;
 import com.kulift.lift.user.dto.PasswordUpdateRequest;
 import com.kulift.lift.user.dto.UserResponse;
 import com.kulift.lift.user.service.UserService;
@@ -28,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
 	private final UserService userService;
-	private final TaskService taskService;
 
 	@GetMapping("/me")
 	public ResponseEntity<UserResponse> getMyInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -57,11 +54,5 @@ public class UserController {
 	public ResponseEntity<String> deleteUser(@PathVariable Long id) {
 		userService.delete(id);
 		return ResponseEntity.ok("삭제되었습니다.");
-	}
-
-	// 프로젝트 키를 필요로 하지 않아서 TaskController 에 넣지 않았음.
-	@GetMapping("/assigned")
-	public ResponseEntity<List<TaskResponse>> getUserTasks(@AuthenticationPrincipal CustomUserDetails userDetails) {
-		return ResponseEntity.ok(taskService.getUserTasks(userDetails.getId()));
 	}
 }

@@ -58,8 +58,22 @@ public class TaskService {
 			.collect(Collectors.toList());
 	}
 
-	public List<TaskResponse> getUserTasks(Long userId) {
-		return taskRepository.findByAssigneeId(userId).stream()
+	public List<TaskResponse> getRecentUserTasks(Long userId, Integer limit) {
+		List<Task> tasks = taskRepository.findByAssigneeId(userId).stream()
+			.sorted((a, b) -> {
+				LocalDateTime aTime = a.getUpdatedAt() != null ? a.getUpdatedAt() : a.getCreatedAt();
+				LocalDateTime bTime = b.getUpdatedAt() != null ? b.getUpdatedAt() : b.getCreatedAt();
+				return bTime.compareTo(aTime); // 최신순
+			})
+			.toList();
+
+		if (limit != null && limit > 0 && limit < tasks.size()) {
+			return tasks.subList(0, limit).stream()
+				.map(TaskResponse::from)
+				.collect(Collectors.toList());
+		}
+
+		return tasks.stream()
 			.map(TaskResponse::from)
 			.collect(Collectors.toList());
 	}
