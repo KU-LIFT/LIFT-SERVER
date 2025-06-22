@@ -60,6 +60,7 @@ public class TaskController {
 		return ResponseEntity.ok(taskService.updateTask(taskId, request, userDetails.getId()));
 	}
 
+	@RequireProjectRole(MEMBER)
 	@PatchMapping("/{taskId}/column")
 	public ResponseEntity<TaskResponse> moveTaskToColumn(@PathVariable Long taskId,
 		@RequestBody @Validated TaskColumnUpdateRequest request) {

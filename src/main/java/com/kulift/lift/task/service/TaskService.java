@@ -58,6 +58,12 @@ public class TaskService {
 			.collect(Collectors.toList());
 	}
 
+	public List<TaskResponse> getUserTasks(Long userId) {
+		return taskRepository.findByAssigneeId(userId).stream()
+			.map(TaskResponse::from)
+			.collect(Collectors.toList());
+	}
+
 	public TaskResponse getTask(Long taskId) {
 		return TaskResponse.from(findTaskById(taskId));
 	}
