@@ -23,10 +23,10 @@ public class GlobalExceptionHandler {
 			.body(ErrorResponse.of(ErrorCode.VALIDATION_ERROR));
 	}
 
-	// @ExceptionHandler(Exception.class)
-	// public ResponseEntity<ErrorResponse> handleUnhandledException(Exception ex) {
-	// 	return ResponseEntity
-	// 		.status(ErrorCode.INTERNAL_ERROR.getStatus())
-	// 		.body(ErrorResponse.of(ErrorCode.INTERNAL_ERROR));
-	// }
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<ErrorResponse> handleUnhandledException(Exception ex) {
+		return ResponseEntity
+			.status(ErrorCode.INTERNAL_ERROR.getStatus())
+			.body(ErrorResponse.of(ErrorCode.INTERNAL_ERROR));
+	}
 }

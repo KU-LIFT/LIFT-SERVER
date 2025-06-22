@@ -49,6 +49,7 @@ public class BoardColumn {
 		return BoardColumn.builder()
 			.name(name)
 			.board(board)
+			.tasks(new ArrayList<>())
 			.build();
 	}
 
