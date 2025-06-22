@@ -58,19 +58,22 @@ public class TaskGitService {
 	@Transactional(readOnly = true)
 	public List<BranchInfoDto> listBranchesForTask(String projectKey, Long taskId) {
 		Task task = taskService.findTaskById(taskId);
+		String branchName = task.getGithubBranch();
+		if (branchName == null) {
+			return List.of();
+		}
 
 		Project project = projectService.findProjectByKey(projectKey);
-
 		Long installationId = project.getGithubInstallationId();
 		if (installationId == null) {
 			throw new CustomException(ErrorCode.GITHUB_INSTALLATION_NOT_FOUND);
 		}
 
 		String token = tokenService.getInstallationAccessToken(installationId);
+		BranchInfoDto branch = gitHubApiClient.getBranchInfo(
+			token, project.getGithubRepoOwner(), project.getGithubRepoName(), branchName);
 
-		String owner = project.getGithubRepoOwner();
-		String repo = project.getGithubRepoName();
-		return gitHubApiClient.listBranches(token, owner, repo);
+		return List.of(branch);
 	}
 
 	@Transactional(readOnly = true)
@@ -79,7 +82,7 @@ public class TaskGitService {
 
 		String branch = task.getGithubBranch();
 		if (branch == null) {
-			throw new CustomException(ErrorCode.GITHUB_BRANCH_ERROR);
+			return List.of();
 		}
 
 		Project project = projectService.findProjectByKey(projectKey);
@@ -132,7 +135,7 @@ public class TaskGitService {
 
 		String headBranch = task.getGithubBranch();
 		if (headBranch == null) {
-			throw new CustomException(ErrorCode.GITHUB_BRANCH_ERROR);
+			return List.of();
 		}
 
 		Project project = projectService.findProjectByKey(projectKey);
