@@ -1,12 +1,13 @@
 package com.kulift.lift.domain.ai.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kulift.lift.global.exception.CustomException;
 import com.kulift.lift.global.exception.ErrorCode;
@@ -60,7 +61,7 @@ public class AiTodoService {
 			.addUserMessage(prompt)
 			.model(ChatModel.GPT_3_5_TURBO)
 			.temperature(0.2)
-			.maxCompletionTokens(1000)
+			.maxCompletionTokens(2048)
 			.build();
 
 		ChatCompletion completion = openAIClient
@@ -77,22 +78,61 @@ public class AiTodoService {
 		String content = choices.getFirst()
 			.message()
 			.content()
-			.orElse("");
+			.orElse("")
+			.trim();
+
 		if (content.isBlank()) {
 			log.warn("AI가 빈 문자열 반환");
 			return List.of();
 		}
 
-		try {
-			return objectMapper.readValue(
-				content.trim(),
-				new TypeReference<List<TodoItem>>() {
-				}
-			);
-		} catch (IOException e) {
-			log.error("AI 응답 파싱 실패: {}", content, e);
+		String validJson = trimToValidJsonArray(content);
+		if (validJson == null) {
+			log.error("유효한 JSON 배열을 추출하지 못함: {}", content);
 			throw new CustomException(ErrorCode.INTERNAL_ERROR);
 		}
+
+		try {
+			JsonNode root = objectMapper.readTree(validJson);
+			List<TodoItem> items = new ArrayList<>();
+			if (root.isArray()) {
+				for (JsonNode node : root) {
+					if (node.has("name") && node.has("description")) {
+						items.add(new TodoItem(
+							node.get("name").asText(),
+							node.get("description").asText()
+						));
+					}
+				}
+			}
+			return items;
+		} catch (IOException e) {
+			log.error("AI 응답 파싱 실패: {}", validJson, e);
+			throw new CustomException(ErrorCode.INTERNAL_ERROR);
+		}
+	}
+
+	// JSON 배열의 유효한 부분만 잘라내기
+	private String trimToValidJsonArray(String raw) {
+		int depth = 0;
+		int lastIndex = -1;
+		for (int i = 0; i < raw.length(); i++) {
+			char c = raw.charAt(i);
+			if (c == '{')
+				depth++;
+			else if (c == '}') {
+				depth--;
+				if (depth == 0)
+					lastIndex = i;
+			}
+		}
+		if (lastIndex != -1) {
+			String trimmed = raw.substring(0, lastIndex + 1);
+			// 배열 앞뒤 추출
+			int arrayStart = trimmed.indexOf('[');
+			return arrayStart != -1 ? trimmed.substring(arrayStart) + "]" : null;
+		}
+		return null;
 	}
 
 	public String extractTextFromFile(MultipartFile file) throws IOException {
