@@ -29,6 +29,7 @@ dependencies {
 
     implementation 'com.openai:openai-java:1.6.0'   // openai
     implementation 'org.apache.poi:poi-ooxml:5.4.1' // .docx 파싱
+    implementation 'org.apache.pdfbox:pdfbox:2.0.30'    // .pdf 파싱
 
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'    // swagger
 
