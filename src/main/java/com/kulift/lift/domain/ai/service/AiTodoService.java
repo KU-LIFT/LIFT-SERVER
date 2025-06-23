@@ -29,18 +29,38 @@ public class AiTodoService {
 
 	public List<TodoItem> extractTodoItems(String documentText) {
 		String prompt = """
-			다음 문서에서 '할 일 목록(TODO)'을 뽑아 JSON 배열 형태로 출력해주세요.
-			• 각 항목은 name, description 두 필드를 가진 객체로 작성
-			• 배열 외에는 어떤 텍스트도 출력하지 마세요.
-			예시: [{"name":"첫 번째","description":"설명1"},...]
-			문서:
+			다음 문서에서 '할 일 목록(TODO)'을 JSON 배열 형식으로 추출해주세요.
+			
+			**요구 사항을 반드시 지켜주세요:**
+			1. 결과는 **반드시 JSON 배열 형태**로 출력하세요. **JSON 외에는 아무 것도 출력하지 마세요.**
+			2. 각 항목은 다음 2개의 필드를 가져야 합니다:
+			   - `"name"`: 할 일 제목 (짧고 핵심적으로 작성)
+			   - `"description"`: 해당 할 일의 상세 설명 (**최소 3문장 이상, 문단 형태로 작성**)
+			3. 최소 6개 이상의 할 일 항목을 추출해주세요.
+			4. JSON 형식은 **정확하게** 지켜주세요. 중괄호, 대괄호, 쌍따옴표 누락 없이 완전한 JSON이어야 합니다.
+			5. 설명은 중복 없이 구체적으로 작성해주세요.
+			
+			예시:
+			[
+			  {
+			    "name": "사용자 인증 기능 구현",
+			    "description": "사용자가 이메일과 비밀번호로 로그인할 수 있도록 인증 기능을 구현합니다. JWT 토큰을 사용해 보안을 강화합니다. 로그인 실패 시 적절한 에러 메시지를 제공해야 합니다."
+			  },
+			  {
+			    "name": "게시판 CRUD 기능 개발",
+			    "description": "사용자는 게시글을 작성, 조회, 수정, 삭제할 수 있어야 합니다. 게시글은 제목, 본문, 작성일자, 작성자로 구성됩니다. 데이터베이스 모델 설계와 API 구현이 필요합니다."
+			  }
+			]
+			
+			아래 문서를 참고해 작업 목록을 작성해주세요:
+			
 			""" + documentText;
 
 		ChatCompletionCreateParams params = ChatCompletionCreateParams.builder()
 			.addUserMessage(prompt)
 			.model(ChatModel.GPT_3_5_TURBO)
-			.temperature(0.0)
-			.maxCompletionTokens(300)
+			.temperature(0.2)
+			.maxCompletionTokens(1000)
 			.build();
 
 		ChatCompletion completion = openAIClient
