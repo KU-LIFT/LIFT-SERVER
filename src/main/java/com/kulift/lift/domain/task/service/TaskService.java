@@ -1,11 +1,13 @@
 package com.kulift.lift.domain.task.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.kulift.lift.domain.auth.entity.User;
 import com.kulift.lift.domain.auth.service.UserService;
@@ -14,9 +16,12 @@ import com.kulift.lift.domain.board.service.BoardColumnService;
 import com.kulift.lift.domain.task.dto.TaskRequest;
 import com.kulift.lift.domain.task.dto.TaskResponse;
 import com.kulift.lift.domain.task.entity.Task;
+import com.kulift.lift.domain.task.entity.TaskFile;
+import com.kulift.lift.domain.task.repository.TaskFileRepository;
 import com.kulift.lift.domain.task.repository.TaskRepository;
 import com.kulift.lift.global.exception.CustomException;
 import com.kulift.lift.global.exception.ErrorCode;
+import com.kulift.lift.global.service.FileStorageService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,6 +33,8 @@ public class TaskService {
 	private final TaskRepository taskRepository;
 	private final BoardColumnService columnService;
 	private final UserService userService;
+	private final FileStorageService fileStorageService;
+	private final TaskFileRepository taskFileRepository;
 
 	@Transactional
 	public TaskResponse createTask(TaskRequest request, Long userId) {
@@ -46,6 +53,20 @@ public class TaskService {
 			.createdBy(creator)
 			.createdAt(LocalDateTime.now())
 			.build();
+
+		if (request.getFiles() != null) {
+			List<TaskFile> fileEntities = new ArrayList<>();
+			for (MultipartFile file : request.getFiles()) {
+				String fileUrl = fileStorageService.saveFile(file);
+				TaskFile taskFile = TaskFile.builder()
+					.fileName(file.getOriginalFilename())
+					.fileUrl(fileUrl)
+					.task(task)
+					.build();
+				fileEntities.add(taskFile);
+			}
+			task.setFiles(fileEntities);
+		}
 
 		column.addTask(task);
 		taskRepository.save(task);

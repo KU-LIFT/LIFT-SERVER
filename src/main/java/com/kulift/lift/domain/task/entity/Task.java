@@ -6,6 +6,7 @@ import java.util.List;
 import com.kulift.lift.domain.auth.entity.User;
 import com.kulift.lift.domain.board.entity.BoardColumn;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -18,6 +19,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -82,6 +84,9 @@ public class Task {
 
 	@Column(length = 100)
 	private String githubLastCommitSha;
+
+	@OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<TaskFile> files;
 
 	public void linkGitInfo(String branch, String prUrl, String commitSha) {
 		this.githubBranch = branch;
