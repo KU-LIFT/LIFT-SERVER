@@ -1,4 +1,4 @@
-package com.kulift.lift.ai.config;
+package com.kulift.lift.domain.ai.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

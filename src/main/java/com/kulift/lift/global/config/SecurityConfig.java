@@ -17,11 +17,11 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.kulift.lift.auth.jwt.JwtAuthenticationFilter;
-import com.kulift.lift.auth.jwt.JwtTokenProvider;
-import com.kulift.lift.auth.oauth.handler.OAuth2LoginSuccessHandler;
-import com.kulift.lift.auth.oauth.service.CustomOAuth2UserService;
-import com.kulift.lift.auth.security.CustomUserDetailsService;
+import com.kulift.lift.global.oauth2.CustomOAuth2UserService;
+import com.kulift.lift.global.oauth2.OAuth2LoginSuccessHandler;
+import com.kulift.lift.global.security.CustomUserDetailsService;
+import com.kulift.lift.global.security.JwtAuthenticationFilter;
+import com.kulift.lift.global.security.JwtTokenProvider;
 
 import lombok.RequiredArgsConstructor;
 
