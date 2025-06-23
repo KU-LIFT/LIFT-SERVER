@@ -15,6 +15,7 @@ public class TaskResponse {
 	private Long id;
 	private String name;
 	private String description;
+	private String projectKey;
 	private Long columnId;
 	private String assignee;
 	private Priority priority;
@@ -32,6 +33,7 @@ public class TaskResponse {
 			.id(task.getId())
 			.name(task.getName())
 			.description(task.getDescription())
+			.projectKey(task.getColumn().getBoard().getProjectKey())
 			.columnId(task.getColumn().getId())
 			.assignee(task.getAssignee() != null ? task.getAssignee().getName() : null)
 			.priority(task.getPriority())
