@@ -3,8 +3,8 @@ package com.kulift.lift.domain.auth.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kulift.lift.domain.auth.dto.PasswordUpdateRequest;
 import com.kulift.lift.domain.auth.dto.UserResponse;
 import com.kulift.lift.domain.auth.service.UserService;
-import com.kulift.lift.global.exception.CustomException;
-import com.kulift.lift.global.exception.ErrorCode;
 import com.kulift.lift.global.security.CustomUserDetails;
 
 import jakarta.validation.Valid;
@@ -35,6 +33,7 @@ public class UserController {
 		return ResponseEntity.ok(UserResponse.from(userService.findById(userDetails.getId())));
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping
 	public ResponseEntity<List<UserResponse>> getAllUsers() {
 		List<UserResponse> users = userService.findAll().stream().map(UserResponse::from).toList();
@@ -53,12 +52,9 @@ public class UserController {
 		return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("/{id}")
-	public ResponseEntity<String> deleteUser(@AuthenticationPrincipal CustomUserDetails userDetails,
-		@PathVariable Long id) {
-		if (!userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
-			throw new CustomException(ErrorCode.FORBIDDEN);
-		}
+	public ResponseEntity<String> deleteUser(@PathVariable Long id) {
 		userService.delete(id);
 		return ResponseEntity.ok("삭제되었습니다.");
 	}
