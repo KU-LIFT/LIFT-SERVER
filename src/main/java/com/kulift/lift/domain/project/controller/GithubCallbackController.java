@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/github")
 @RequiredArgsConstructor
-public class ProjectGithubController {
+public class GithubCallbackController {
 
 	private final GitHubInstallationService installationService;
 	private final BoardService boardService;

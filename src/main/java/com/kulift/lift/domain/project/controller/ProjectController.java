@@ -21,6 +21,7 @@ import com.kulift.lift.domain.project.dto.ProjectResponse;
 import com.kulift.lift.domain.project.dto.ProjectUpdateRequest;
 import com.kulift.lift.domain.project.service.ProjectMemberService;
 import com.kulift.lift.domain.project.service.ProjectService;
+import com.kulift.lift.global.git.dto.BranchInfoDto;
 import com.kulift.lift.global.security.CustomUserDetails;
 
 import jakarta.validation.Valid;
@@ -33,6 +34,7 @@ public class ProjectController {
 
 	private final ProjectService projectService;
 	private final ProjectMemberService projectMemberService;
+	private final ProjectGitService projectGitService;
 
 	@PostMapping
 	public ResponseEntity<ProjectResponse> createProject(@RequestBody @Valid ProjectCreateRequest request,
@@ -64,5 +66,11 @@ public class ProjectController {
 	public ResponseEntity<Void> deleteProject(@PathVariable String projectKey) {
 		projectService.deleteProject(projectKey);
 		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/{projectKey}/git/branches")
+	public ResponseEntity<List<BranchInfoDto>> listBranches(@PathVariable String projectKey) {
+		List<BranchInfoDto> branches = projectGitService.getBranches(projectKey);
+		return ResponseEntity.ok(branches);
 	}
 }
