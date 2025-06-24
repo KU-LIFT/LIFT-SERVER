@@ -3,8 +3,6 @@ package com.kulift.lift.domain.task.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import com.kulift.lift.domain.task.entity.Priority;
 
 import jakarta.validation.constraints.NotBlank;
@@ -33,5 +31,5 @@ public class TaskRequest {
 
 	private List<String> tags;
 
-	private List<MultipartFile> files;
+	// private List<MultipartFile> files;
 }

@@ -27,7 +27,7 @@ public class TaskResponse {
 	private LocalDateTime updatedAt;
 	private String createdBy;
 	private String updatedBy;
-	private List<TaskFileResponse> files;
+	// private List<TaskFileResponse> files;
 
 	public static TaskResponse from(Task task) {
 		return TaskResponse.builder()
@@ -46,7 +46,7 @@ public class TaskResponse {
 			.updatedAt(task.getUpdatedAt())
 			.createdBy(task.getCreatedBy() != null ? task.getCreatedBy().getName() : null)
 			.updatedBy(task.getUpdatedBy() != null ? task.getUpdatedBy().getName() : null)
-			.files(TaskFileResponse.of(task.getFiles()))
+			// .files(TaskFileResponse.of(task.getFiles()))
 			.build();
 	}
 }

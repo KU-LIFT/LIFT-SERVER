@@ -29,7 +29,7 @@ public class ProjectGithubController {
 		installationService.linkInstallationToProject(projectKey, installationId);
 		Long boardId = boardService.findFirstBoardIdByProjectKey(projectKey);
 
-		String redirectUrl = "http://kulift.com/projects/" + projectKey + "/boards/" + boardId;
+		String redirectUrl = "http://kulift.com/boards/";
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.set(HttpHeaders.LOCATION, redirectUrl);
